@@ -22,3 +22,23 @@ spec:
           command: ["redis-server", "--slaveof", "redis-master", "6379"]
           ports:
             - containerPort: 6379
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-slave
+  labels:
+    app: redis
+    role: slave
+    tier: backend
+spec:
+  selector:
+    app: redis
+    role: slave
+    tier: backend
+  type: NodePort
+  ports:
+    - port: 6379
+      targetPort: 6379
+      nodePort: 31379 # for local debug purpose

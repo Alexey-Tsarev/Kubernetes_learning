@@ -1,3 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-php
+spec:
+  selector:
+    matchLabels:
+      app: apache-php
+      tier: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: apache-php
+        tier: backend
+    spec:
+      containers:
+        - name: apache-php
+          image: alexeytsarev/apache_php:2.4_7.3
+          ports:
+            - containerPort: 8073
+          volumeMounts:
+            - name: apache-config
+              mountPath: /etc/httpd/conf.d/welcome.conf
+              subPath: welcome.conf
+              readOnly: true
+            - name: www
+              mountPath: /usr/share/httpd/noindex/index.php
+              subPath: index.php
+              readOnly: true
+            - name: www
+              mountPath: /usr/share/httpd/noindex/.htaccess
+              subPath: .htaccess
+              readOnly: true
+      volumes:
+        - name: apache-config
+          configMap:
+            name: apache-config
+        - name: www
+          configMap:
+            name: www
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: apache-php
+  labels:
+    app: apache-php
+    tier: backend
+spec:
+  selector:
+    app: apache-php
+    tier: backend
+  ports:
+    - port: 8073
+      targetPort: 8073
+---
+
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
