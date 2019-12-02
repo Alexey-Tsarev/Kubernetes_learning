@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: communicator-writer
+  labels:
+    app: communicator-writer
+spec:
+  selector:
+    matchLabels:
+      name: communicator-writer
+  template:
+    metadata:
+      labels:
+        name: communicator-writer
+    spec:
+      containers:
+        - name: communicator-writer
+          image: alexeytsarev/redis_communicator
+          env:
+            - name: APP_ROLE
+              value: writer
+            - name: REDIS_HOST
+              value: redis-master
+            - name: REDIS_PORT
+              value: "6379"

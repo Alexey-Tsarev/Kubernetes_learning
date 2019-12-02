@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: a
+  template:
+    metadata:
+      labels:
+        app: a
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.17.5
+          ports:
+            - containerPort: 80 # is not used by Kubernetes. It's just for info
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-svc
+  labels:
+    app: b
+    app2: c
+spec:
+  #  clusterIP: None
+  type: NodePort
+  ports:
+    - nodePort: 30080 # access to service via external port
+      port: 20080     # exposed internally in cluster (available internally inside container via ingress-svc:20080)
+      targetPort: 80  # port that containers are listening on
+  selector:
+    app: a
+
+
+# kubectl get endpoints ingress-svc -o yaml

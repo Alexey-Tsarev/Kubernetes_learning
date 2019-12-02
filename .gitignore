@@ -1,0 +1,4 @@
+.idea/
+redis_communicator/log/
+*.iml
+.DS_Store

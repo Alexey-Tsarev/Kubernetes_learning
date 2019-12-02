@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: interactive-third
+  labels:
+    app: interactive-third
+spec:
+  containers:
+    - image: quay.io/myafk/interactive:stable
+      name: interactive-third
+      command: ["interactive", "config", "-t=third"]
+      env:
+        - name: GRIDU_SECRET_ENV
+          valueFrom:
+            secretKeyRef:
+              name: interactive-cm-kv-secret
+              key: GRIDU_SECRET_ENV

@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: www
+data:
+  .htaccess: |
+    DirectoryIndex index.php
+
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule (.*) index.php
+  index.php: |
+    <html>
+    Welcome!<br>
+    <br>
+    <?php
+    $current_url = getenv("REQUEST_SCHEME") . "://" . getenv("HTTP_HOST") . ":" . getenv("SERVER_PORT") . getenv("REQUEST_URI");
+    ?>
+
+    You are here: <a href="<?php echo $current_url; ?>"><?php echo $current_url; ?></a>
+    <br>
+
+    <?php
+      $ip = $_SERVER['REMOTE_ADDR'];
+      echo "Got request from IP (frontend): ". $ip . "<br>\n";
+
+      $hostname = gethostbyaddr($ip);
+
+      if (($hostname) && ($hostname != $ip))
+          echo 'Host name for ' . $ip . ': ' . $hostname . "<br>\n";
+
+      $HTTP_X_REAL_IP = getenv('HTTP_X_REAL_IP');
+      if ($HTTP_X_REAL_IP) {
+          echo 'Proxy reported HTTP_X_REAL_IP: ' . $HTTP_X_REAL_IP . "<br>\n";
+
+          $hostname = gethostbyaddr($HTTP_X_REAL_IP);
+
+          if (($hostname) && ($hostname != $HTTP_X_REAL_IP))
+              echo 'Host name for ' . $HTTP_X_REAL_IP . ': ' . $hostname . "<br>\n";
+      }
+
+      $HTTP_X_FORWARDED_FOR = getenv('HTTP_X_FORWARDED_FOR');
+      if ($HTTP_X_FORWARDED_FOR) {
+          echo 'Proxy reported HTTP_X_FORWARDED_FOR: ' . $HTTP_X_FORWARDED_FOR . "<br>\n";
+
+          $hostname = gethostbyaddr($HTTP_X_FORWARDED_FOR);
+
+          if (($hostname) && ($hostname != $HTTP_X_FORWARDED_FOR))
+              echo 'Host name for ' . $HTTP_X_FORWARDED_FOR . ': ' . $hostname . "<br>\n";
+      }
+    ?>
+
+    <br>
+    Demo links:<br>
+    <a href="/">/ - root</a><br>
+    <a href="/web">/web - web-server root</a><br>
+    <a href="/web/getTaskAnswer">/web/getTaskAnswer - web-server getTaskAnswer</a><br>
+    <a href="/kibana/">/kibana/ - Kibana</a><br>
+    <a href="/www">/www - apache-php with rewrite url</a><br>
+    <a href="/api">/api - apache-php with rewrite url to root</a><br>
+    <a href="/xxx">/xxx - apache-php path with or: /xxx|/yyy|/zzz</a><br>
+    <a href="/yyy">/yyy - apache-php path with or: /xxx|/yyy|/zzz</a><br>
+    <a href="/zzz">/zzz - apache-php path with or: /xxx|/yyy|/zzz</a><br>
+    <br>
+    <br>
+
+    Raw HTTP data:
+    <xmp>
+        <?php
+        print_r(getallheaders());
+        echo "\n";
+
+        print_r($_SERVER);
+        echo "\n";
+        ?>
+    </xmp>
+    </html>

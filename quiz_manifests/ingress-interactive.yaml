@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: interactive-deployment
+  labels:
+    app: interactive-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: interactive
+  template:
+    metadata:
+      labels:
+        app: interactive
+    spec:
+      containers:
+        - name: interactive-ingress
+          image: quay.io/myafk/interactive:stable
+          command: ["interactive", "ingress"]
+          ports:
+            - containerPort: 8085
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-svc-interactive
+  labels:
+    app: ingress-svc-interactive
+spec:
+  type: NodePort
+  ports:
+    - nodePort: 30085
+      port: 20085
+      targetPort: 8085
+  selector:
+    app: interactive
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: interactive-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            backend:
+              serviceName: ingress-svc-interactive
+              servicePort: 8085
+
+
+# kubectl get pods -n kube-system
+# kubectl logs nginx-ingress-controller-6fc5bcc8c9-mx8f7 -n kube-system
+# kubectl exec -it -n kube-system nginx-ingress-controller-6fc5bcc8c9-mx8f7 cat /etc/nginx/nginx.conf
+# http://192.168.99.101/getTaskAnswer

@@ -1,0 +1,63 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: apache-php-root
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            backend:
+              serviceName: apache-php
+              servicePort: 8073
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: apache-php-www
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /app/www$1
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /www(.*)
+            backend:
+              serviceName: apache-php
+              servicePort: 8073
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: apache-php-api
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api(/|$)(.*)
+            backend:
+              serviceName: apache-php
+              servicePort: 8073
+---
+
+# Below works without "apache-php-root"
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: apache-php-related
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /xxx|/yyy|/zzz
+            backend:
+              serviceName: apache-php
+              servicePort: 8073

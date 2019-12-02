@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: communicator-reader
+  labels:
+    app: communicator-reader
+spec:
+  selector:
+    matchLabels:
+      name: communicator-reader
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: communicator-reader
+    spec:
+      containers:
+        - name: communicator-reader
+          image: alexeytsarev/redis_communicator
+          env:
+            - name: APP_ROLE
+              value: reader
+            - name: REDIS_HOST
+              value: redis-slave
+            - name: REDIS_PORT
+              value: "6379"

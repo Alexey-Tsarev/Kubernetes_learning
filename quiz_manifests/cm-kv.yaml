@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+data:
+  GRIDU_CONFIGMAP_ENV: KUBERNETES_IS_VERY_FUN
+metadata:
+  name: interactive-cm-kv
+  namespace: default

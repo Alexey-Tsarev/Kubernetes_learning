@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: interactive-first
+  labels:
+    app: interactive-first
+spec:
+  containers:
+    - image: quay.io/myafk/interactive:stable
+      name: interactive-first
+      command: ["interactive", "config", "-t=first"]
+      env:
+        - name: GRIDU_CONFIGMAP_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: interactive-cm-kv
+              key: GRIDU_CONFIGMAP_ENV

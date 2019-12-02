@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apache-config
+data:
+  welcome.conf: |
+    <Directory "/usr/share/httpd/noindex">
+        Options -Indexes -MultiViews
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    <VirtualHost *>
+        ServerName   _default_
+        ServerAlias  www._default_
+        ServerAdmin  webmaster@_default_
+        DocumentRoot /usr/share/httpd/noindex
+    </VirtualHost>

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-master-config
+data:
+  redis.conf: |
+    appendonly yes

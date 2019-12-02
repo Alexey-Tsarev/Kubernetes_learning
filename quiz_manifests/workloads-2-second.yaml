@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: workloads-svc
+  labels:
+    app: workloads-first
+spec:
+  clusterIP: None
+  selector:
+    app: workloads-first
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: workloads-ss-first
+spec:
+  selector:
+    matchLabels:
+      app: workloads-first # has to match .spec.template.metadata.labels
+  serviceName: workloads-first
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: workloads-first # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: workloads-first
+          image: quay.io/myafk/interactive:stable
+          command: ["interactive", "workloads", "-t=second"]
+          env:
+            - name: serviceName
+              value: workloads-svc

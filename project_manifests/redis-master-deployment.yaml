@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-master
+spec:
+  selector:
+    matchLabels:
+      app: redis
+      role: master
+      tier: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: master
+        tier: backend
+    spec:
+      containers:
+        - name: redis-master
+          image: redis
+          command: ["redis-server", "/redis-master-config/redis.conf"]
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: redis-master-config
+              mountPath: /redis-master-config
+            - name: redis-master-pv
+              mountPath: /data
+      volumes:
+        - name: redis-master-config
+          configMap:
+            name: redis-master-config
+        - name: redis-master-pv
+          hostPath:
+            path: /data/redis-master
