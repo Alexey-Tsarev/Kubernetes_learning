@@ -42,7 +42,8 @@ spec:
             name: redis-master-config
         - name: redis-master-pv
           hostPath:
-            path: /data/redis-master
+            path: /mnt/redis-master
+            type: DirectoryOrCreate
 ---
 
 apiVersion: v1

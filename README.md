@@ -5,17 +5,46 @@ cd project_manifests
 kubectl apply -f ./
 ```
 
-Open ingress IP via a browser:
+Find out an ingress IP:
+ - Minikube:
 ```
-$ minikube addons enable ingress # minikube only
+$ minikube addons enable ingress
+ingress was successfully enabled
+
 $ kubectl get ingress
 NAME                 HOSTS   ADDRESS          PORTS   AGE
-apache-php-api       *       192.168.99.104   80      9d
-apache-php-related   *       192.168.99.104   80      9d
-apache-php-root      *       192.168.99.104   80      9d
-apache-php-www       *       192.168.99.104   80      9d
-kibana               *       192.168.99.104   80      9d
-web-server           *       192.168.99.104   80      9d
+apache-php-api       *       192.168.99.106   80      14m
+apache-php-related   *       192.168.99.106   80      14m
+apache-php-root      *       192.168.99.106   80      14m
+apache-php-www       *       192.168.99.106   80      14m
+kibana               *       192.168.99.106   80      14m
+web-server           *       192.168.99.106   80      14m
+```
+
+ - Some cloud provider (tested on MCS https://mcs.mail.ru):
+```
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
+namespace/ingress-nginx created
+configmap/nginx-configuration created
+configmap/tcp-services created
+configmap/udp-services created
+serviceaccount/nginx-ingress-serviceaccount created
+clusterrole.rbac.authorization.k8s.io/nginx-ingress-clusterrole created
+role.rbac.authorization.k8s.io/nginx-ingress-role created
+rolebinding.rbac.authorization.k8s.io/nginx-ingress-role-nisa-binding created
+clusterrolebinding.rbac.authorization.k8s.io/nginx-ingress-clusterrole-nisa-binding created
+deployment.apps/nginx-ingress-controller created
+
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml
+service/ingress-nginx created
+
+$ kubectl get svc -A | grep ingress-nginx | grep LoadBalancer
+ingress-nginx   ingress-nginx                      LoadBalancer   10.254.58.66     <pending>     80:31818/TCP,443:31932/TCP   58s
+
+$ sleep 30s
+
+$ kubectl get svc -A | grep ingress-nginx | grep LoadBalancer
+ingress-nginx   ingress-nginx                      LoadBalancer   10.254.58.66     89.208.221.10   80:31818/TCP,443:31932/TCP   2m29s
 ```
 
 Redis communicator reader/writer logs example (locally):
