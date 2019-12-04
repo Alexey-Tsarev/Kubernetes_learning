@@ -82,7 +82,7 @@ $ MAX_TIME=2 REDIS_HOST=192.168.99.104 REDIS_PORT=30379 APP_ROLE=writer python3 
 2019-12-02 16:53:43,281 - INFO - Finish
 ```
 
-The same, but in Kubernetes:
+The same, but in Kubernetes (Minikube, 1 worker node):
 ```
 $ kubectl logs communicator-reader-cb7d6766d-rrk8q
 2019-12-02 13:02:47,282 - INFO - Role: reader
@@ -109,7 +109,82 @@ $ kubectl logs communicator-writer-w48fg
 ...
 ```
 
+Kubernetes (MCS, 2 worker nodes):
+```
+$ kubectl get nodes
+NAME                                      STATUS   ROLES    AGE     VERSION
+kubernetes-cluster-3151-default-group-0   Ready    <none>   5m19s   v1.15.3
+kubernetes-cluster-3151-default-group-1   Ready    <none>   5m42s   v1.15.3
+kubernetes-cluster-3151-master-0          Ready    master   8m34s   v1.15.3
 
+$ kubectl get pods
+NAME                                  READY   STATUS    RESTARTS   AGE
+apache-php-5499dddcc6-5276b           1/1     Running   0          6m23s
+communicator-reader-8f88fddf6-vdn29   1/1     Running   1          6m22s
+communicator-writer-4zqft             1/1     Running   0          6m23s
+communicator-writer-mlj5w             1/1     Running   1          6m23s
+elasticsearch-0                       1/1     Running   0          6m22s
+elasticsearch-1                       1/1     Running   0          6m22s
+elasticsearch-2                       1/1     Running   0          6m22s
+kibana-7868d89fc4-8ctnf               1/1     Running   0          6m22s
+redis-master-986cfd7f8-25t98          1/1     Running   0          6m21s
+redis-slave-7794cd69d8-8schw          1/1     Running   0          6m20s
+redis-slave-7794cd69d8-l7kw4          1/1     Running   0          6m20s
+web-server-f5f685dd8-p5gkz            1/1     Running   0          6m19s
+
+$ kubectl logs -f communicator-reader-8f88fddf6-vdn29
+2019-12-04 11:56:25,561 - INFO - Role: reader
+2019-12-04 11:56:25,563 - INFO - Max working time: 0
+2019-12-04 11:56:25,565 - INFO - Connecting to Redis: redis-slave:6379
+2019-12-04 11:56:26,594 - INFO - Got message: {'type': 'psubscribe', 'pattern': None, 'channel': b'*', 'data': 1}
+2019-12-04 11:56:26,596 - INFO - Got message: {'type': 'pmessage', 'pattern': b'*', 'channel': b'nodes', 'data': b'{"communicator-writer-mlj5w": "2019-12-04 11:56:25.966882"}'}
+2019-12-04 11:56:26,598 - INFO - Got message: {'type': 'pmessage', 'pattern': b'*', 'channel': b'nodes', 'data': b'{"communicator-writer-4zqft": "2019-12-04 11:56:26.390189"}'}
+2019-12-04 11:56:27,600 - INFO - Got message: {'type': 'pmessage', 'pattern': b'*', 'channel': b'nodes', 'data': b'{"communicator-writer-mlj5w": "2019-12-04 11:56:26.978571"}'}
+2019-12-04 11:56:27,603 - INFO - Got message: {'type': 'pmessage', 'pattern': b'*', 'channel': b'nodes', 'data': b'{"communicator-writer-4zqft": "2019-12-04 11:56:27.402190"}'}
+2019-12-04 11:56:28,606 - INFO - Got message: {'type': 'pmessage', 'pattern': b'*', 'channel': b'nodes', 'data': b'{"communicator-writer-mlj5w": "2019-12-04 11:56:27.983834"}'}
+2019-12-04 11:56:28,606 - INFO - Got message: {'type': 'pmessage', 'pattern': b'*', 'channel': b'nodes', 'data': b'{"communicator-writer-4zqft": "2019-12-04 11:56:28.408106"}'}
+2019-12-04 11:56:29,615 - INFO - Got message: {'type': 'pmessage', 'pattern': b'*', 'channel': b'nodes', 'data': b'{"communicator-writer-mlj5w": "2019-12-04 11:56:28.994569"}'}
+2019-12-04 11:56:29,618 - INFO - Got message: {'type': 'pmessage', 'pattern': b'*', 'channel': b'nodes', 'data': b'{"communicator-writer-4zqft": "2019-12-04 11:56:29.415702"}'}
+2019-12-04 11:56:30,621 - INFO - Got message: {'type': 'pmessage', 'pattern': b'*', 'channel': b'nodes', 'data': b'{"communicator-writer-mlj5w": "2019-12-04 11:56:29.999658"}'}
+2019-12-04 11:56:30,622 - INFO - Got message: {'type': 'pmessage', 'pattern': b'*', 'channel': b'nodes', 'data': b'{"communicator-writer-4zqft": "2019-12-04 11:56:30.422066"}'}
+2019-12-04 11:56:31,622 - INFO - Got message: {'type': 'pmessage', 'pattern': b'*', 'channel': b'nodes', 'data': b'{"communicator-writer-mlj5w": "2019-12-04 11:56:31.003537"}'}
+...
+
+$ kubectl logs -f communicator-writer-4zqft
+2019-12-04 11:54:27,397 - INFO - Role: writer
+2019-12-04 11:54:27,397 - INFO - Max working time: 0
+2019-12-04 11:54:27,397 - INFO - Connecting to Redis: redis-master:6379
+2019-12-04 11:54:27,398 - INFO - Set key/value: communicator-writer-4zqft/Up
+2019-12-04 11:54:27,414 - INFO - Publish message to 'nodes' channel: {"communicator-writer-4zqft": "2019-12-04 11:54:27.414783"}
+2019-12-04 11:54:28,418 - INFO - Publish message to 'nodes' channel: {"communicator-writer-4zqft": "2019-12-04 11:54:28.417014"}
+2019-12-04 11:54:29,423 - INFO - Publish message to 'nodes' channel: {"communicator-writer-4zqft": "2019-12-04 11:54:29.423111"}
+2019-12-04 11:54:30,426 - INFO - Publish message to 'nodes' channel: {"communicator-writer-4zqft": "2019-12-04 11:54:30.426091"}
+2019-12-04 11:54:31,432 - INFO - Publish message to 'nodes' channel: {"communicator-writer-4zqft": "2019-12-04 11:54:31.432074"}
+2019-12-04 11:54:32,434 - INFO - Publish message to 'nodes' channel: {"communicator-writer-4zqft": "2019-12-04 11:54:32.434407"}
+2019-12-04 11:54:33,436 - INFO - Publish message to 'nodes' channel: {"communicator-writer-4zqft": "2019-12-04 11:54:33.436297"}
+2019-12-04 11:54:34,439 - INFO - Publish message to 'nodes' channel: {"communicator-writer-4zqft": "2019-12-04 11:54:34.439084"}
+2019-12-04 11:54:35,441 - INFO - Publish message to 'nodes' channel: {"communicator-writer-4zqft": "2019-12-04 11:54:35.441071"}
+2019-12-04 11:54:36,443 - INFO - Publish message to 'nodes' channel: {"communicator-writer-4zqft": "2019-12-04 11:54:36.443264"}
+...
+
+$ kubectl logs -f communicator-writer-mlj5w
+2019-12-04 11:56:23,914 - INFO - Role: writer
+2019-12-04 11:56:23,916 - INFO - Max working time: 0
+2019-12-04 11:56:23,916 - INFO - Connecting to Redis: redis-master:6379
+2019-12-04 11:56:23,917 - INFO - Set key/value: communicator-writer-mlj5w/Up
+2019-12-04 11:56:23,958 - INFO - Publish message to 'nodes' channel: {"communicator-writer-mlj5w": "2019-12-04 11:56:23.958644"}
+2019-12-04 11:56:24,963 - INFO - Publish message to 'nodes' channel: {"communicator-writer-mlj5w": "2019-12-04 11:56:24.963232"}
+2019-12-04 11:56:25,969 - INFO - Publish message to 'nodes' channel: {"communicator-writer-mlj5w": "2019-12-04 11:56:25.966882"}
+2019-12-04 11:56:26,978 - INFO - Publish message to 'nodes' channel: {"communicator-writer-mlj5w": "2019-12-04 11:56:26.978571"}
+2019-12-04 11:56:27,986 - INFO - Publish message to 'nodes' channel: {"communicator-writer-mlj5w": "2019-12-04 11:56:27.983834"}
+2019-12-04 11:56:28,994 - INFO - Publish message to 'nodes' channel: {"communicator-writer-mlj5w": "2019-12-04 11:56:28.994569"}
+2019-12-04 11:56:29,999 - INFO - Publish message to 'nodes' channel: {"communicator-writer-mlj5w": "2019-12-04 11:56:29.999658"}
+2019-12-04 11:56:31,003 - INFO - Publish message to 'nodes' channel: {"communicator-writer-mlj5w": "2019-12-04 11:56:31.003537"}
+2019-12-04 11:56:32,006 - INFO - Publish message to 'nodes' channel: {"communicator-writer-mlj5w": "2019-12-04 11:56:32.005897"}
+...
+```
 ---
+\
+\
 Good luck!  
 Alexey Tsarev, Tsarev.Alexey at gmail.com
