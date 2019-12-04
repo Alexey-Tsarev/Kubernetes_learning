@@ -1,3 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: communicator-master-config
+data:
+  REDIS_HOST: redis-master
+  REDIS_PORT: "6379"
+---
+
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -20,6 +29,12 @@ spec:
             - name: APP_ROLE
               value: writer
             - name: REDIS_HOST
-              value: redis-master
+              valueFrom:
+                configMapKeyRef:
+                  name: communicator-master-config
+                  key: REDIS_HOST
             - name: REDIS_PORT
-              value: "6379"
+              valueFrom:
+                configMapKeyRef:
+                  name: communicator-master-config
+                  key: REDIS_PORT
