@@ -20,6 +20,7 @@ apache-php-www       *       192.168.99.106   80      14m
 kibana               *       192.168.99.106   80      14m
 web-server           *       192.168.99.106   80      14m
 ```
+Open the http://192.168.99.106 link in a browser.
 
  - Some cloud provider (tested on MCS https://mcs.mail.ru):
 ```
@@ -46,6 +47,7 @@ $ sleep 30s
 $ kubectl get svc -A | grep ingress-nginx | grep LoadBalancer
 ingress-nginx   ingress-nginx                      LoadBalancer   10.254.58.66     89.208.221.10   80:31818/TCP,443:31932/TCP   2m29s
 ```
+Open the http://89.208.221.10 link in a browser.
 
 Redis communicator reader/writer logs example (locally):
 ```
